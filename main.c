@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
+#include <sys/user.h>
 #include <sys/ptrace.h>
 #include <sys/wait.h>
 
@@ -22,14 +23,20 @@ int main(int argc, char **argv)  {
 	// listen for sigchld
 	// attach
 	int childStatus;
-	int instruction = 0;
+	int iNum = 0;
 	wait(&childStatus);
 	while (WIFSTOPPED(childStatus)) {
-		instruction++;
+
+		struct user_regs_struct regs;
+		ptrace(PTRACE_GETREGS, childPid, 0, &regs);
+		unsigned instr = ptrace(PTRACE_PEEKTEXT, childPid, regs.rip, 0);
+		printf("icounter = %u.  EIP = 0x%08x.  instr = 0x%08x\n", iNum, regs.rip, instr);
+
 		if (ptrace(PTRACE_SINGLESTEP, childPid, 0, 0) < 0) perror("ptrace");
+		iNum++;
+		printf("(%d) %d instruct\n", childPid, iNum);
 		wait(&childStatus);
 	}
-	printf("(%d) %d instruct\n", childPid, instruction);
 
 	return 0;
 }
