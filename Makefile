@@ -1,10 +1,7 @@
 all: 
+	gcc -g -Wall testProg.c -o testProg -static
 	gcc -g -Wall main.c -o mintdb
 
-testEcho:
+test:
 	make all
-	./mintdb echo hi
-
-testLs:
-	make all
-	./mintdb ls -l
+	./mintdb ./testProg
