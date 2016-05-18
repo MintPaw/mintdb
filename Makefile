@@ -7,7 +7,7 @@ all:
 
 test:
 	make all
-	/bin/mintdb bin/testProg
+	bin/mintdb bin/testProg
 
 testSimple:
 	make all
