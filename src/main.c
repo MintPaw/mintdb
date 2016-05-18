@@ -17,13 +17,10 @@ struct Breakpoint {
 };
 
 pid_t childPid;
-struct Breakpoint **breakpoints;
-int breakpointNum = 0;
 
-void setInstructionBreakpoint(unsigned long long instrNum);
+struct Breakpoint *setInstructionBreakpoint(unsigned long long instrAddr);
 
 int main(int argc, char **argv)  {
-	breakpoints = (struct Breakpoint **)malloc(sizeof(struct Breakpoint *) * 100);
 	childPid = fork();
 
 	if (childPid == 0) {
@@ -31,10 +28,13 @@ int main(int argc, char **argv)  {
 		if (execvp(argv[1], &argv[1]) < 0) perror("execvp");
 	}
 
+	struct Breakpoint **breakpoints = (struct Breakpoint **)malloc(sizeof(struct Breakpoint *) * 100);
+	int breakpointNum = 0;
+
 	int childStatus;
 	wait(&childStatus);
 
-	setInstructionBreakpoint((unsigned long long)0x00000000004000da);
+	breakpoints[breakpointNum++] = setInstructionBreakpoint((unsigned long long)0x00000000004000da);
 
 	char firstTimeContinue = 1;
 	int instrNum = 0;
@@ -70,15 +70,16 @@ int main(int argc, char **argv)  {
 	return 0;
 }
 
-void setInstructionBreakpoint(unsigned long long instrAddr) {
+struct Breakpoint *setInstructionBreakpoint(unsigned long long instrAddr) {
 	long instr = ptrace(PTRACE_PEEKTEXT, childPid, (void*)instrAddr, 0);
 	printf("Adding breakpoint at instruction 0x%08llx\n", instrAddr);
 
 	struct Breakpoint *b = (struct Breakpoint *)malloc(sizeof(struct Breakpoint));
 	b->instrAddr = instrAddr;
 	b->origInstr = instr;
-	breakpoints[breakpointNum++] = b;
 
 	long trapInstr = (instr & 0xFFFFFFFFFFFFFF00) | 0xCC;
 	ptrace(PTRACE_POKETEXT, childPid, (void*)instrAddr, trapInstr);
+
+	return b;
 }
