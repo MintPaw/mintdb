@@ -1,14 +1,14 @@
 extraWarnings=-Werror -Wno-unused-but-set-variable
 all: 
-	gcc -g -Wall testProg.c -o testProg -static $(extraWarnings)
-	gcc -g -Wall main.c -o mintdb $(extraWarnings)
-	nasm -f elf64 testProgSimple.asm -l testProgSimple.lst 
-	ld testProgSimple.o -o testProgSimple
+	gcc -g -Wall src/main.c -o bin/mintdb $(extraWarnings)
+	gcc -g -Wall src/testProg.c -o bin/testProg -static $(extraWarnings)
+	nasm -f elf64 src/testProgSimple.asm -l obj/testProgSimple.lst -o obj/testProgSimple.o
+	ld obj/testProgSimple.o -o bin/testProgSimple
 
 test:
 	make all
-	./mintdb ./testProg
+	/bin/mintdb bin/testProg
 
 testSimple:
 	make all
-	./mintdb ./testProgSimple
+	bin/mintdb bin/testProgSimple
