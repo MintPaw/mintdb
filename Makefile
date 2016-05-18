@@ -1,4 +1,4 @@
-extraWarnings=-Werror -Wno-unused-but-set-variable
+extraWarnings=-Werror -Wno-unused-but-set-variable -Wno-unused-variable
 all: 
 	gcc -g -Wall src/main.c -o bin/mintdb $(extraWarnings)
 	gcc -g -Wall src/testProg.c -o bin/testProg -static $(extraWarnings)
