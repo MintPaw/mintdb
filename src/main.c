@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <signal.h>
 #include <string.h>
+#include <dwarf.h>
+#include <libdwarf/libdwarf.h>
 #include <sys/user.h>
 #include <sys/ptrace.h>
 #include <sys/wait.h>
